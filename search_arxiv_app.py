@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
+import re
 
 def search_arxiv():
     st.title('Arxiv 最新论文')
@@ -52,11 +53,15 @@ def search_arxiv():
                     authors = paper.find('p', class_='authors').text.strip()
                     abstract = paper.find('span', class_='abstract-full').text.strip()
                     published_date = paper.find("p", class_="is-size-7").text.strip()
+                    paper_link = paper.find('p',class_='list-title is-inline-block').text
+                    paper_link = re.search(r'\d+(\.\d+)?',paper_link).group()
+                    print(type(paper_link))
 
                     if i < quantity:
                         st.write(f'### {i+1}. {title}')
                         st.write(f'{"".join(authors.split())}')
                         st.write(f'提交时间: {published_date}')
+                        st.write(f'link: https://arxiv.org/pdf/{paper_link}')
                         st.write(f'摘要: {abstract}')
                         abstract=translate_english_to_chinese(abstract)
                         st.write(f'中文翻译: {abstract}')
